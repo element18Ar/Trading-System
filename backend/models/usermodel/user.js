@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin'], default: 'user' ,
+    enum: ['admin'], default: 'user', 
     required: true,
   },
   email: {
@@ -24,5 +24,5 @@ const userSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-const User = mongoose.model('User', userSchema);
-export default User;
+const User = mongoose.model('user', userSchema);
+export default user;
