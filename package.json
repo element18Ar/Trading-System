@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev:all": "concurrently -n Frontend,Authentication,Product,Negotiation -c cyan,red,green,blue \"cd frontend && npm run dev\" \"cd backend/auth-service && npm run dev\" \"cd backend/product-service && npm run dev\" \"cd backend/negotiation-service && npm run dev\""
   },
   "repository": {
     "type": "git",
@@ -13,12 +13,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/element18Ar/Trading-System/issues"
   },
   "homepage": "https://github.com/element18Ar/Trading-System#readme",
   "dependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "dotenv-flow": "^4.1.0",
+    "mongoose": "^8.20.0"
   }
 }

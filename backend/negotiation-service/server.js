@@ -14,7 +14,7 @@ app.get("/", (req, res) => {
   res.send("Server and MongoDB are working!");
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   connectDB(mongoose);
   console.log(`Server running on http://localhost:${PORT}`)
