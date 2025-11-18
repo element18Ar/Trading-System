@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/element18Ar/Trading-System/issues"
   },
-  "homepage": "https://github.com/element18Ar/Trading-System#readme"
+  "homepage": "https://github.com/element18Ar/Trading-System#readme",
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  }
 }
