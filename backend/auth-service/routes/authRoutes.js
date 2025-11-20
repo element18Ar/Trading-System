@@ -5,7 +5,7 @@ import {
 
 const router = express.Router();
 
-// For Job Seekers
+
 router.post('/register', Register);
 router.post('/login', Login);
 
