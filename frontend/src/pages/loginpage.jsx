@@ -27,8 +27,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // 1. Send an HTTP POST request to your backend login endpoint
-      // Assuming your login endpoint is '/api/auth/login'
+
       const response = await fetch('/api/auth/login', { 
         method: 'POST',
         headers: {

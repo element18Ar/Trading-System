@@ -37,7 +37,7 @@ const Register = () => {
     setLoading(true);
 
     try {
-      // We only send 'username', 'email', and 'password' to the backend
+     
       const { confirmPassword, ...dataToSend } = formData; 
 
       const response = await fetch('/api/auth/register', {
@@ -45,7 +45,7 @@ const Register = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(dataToSend), // Send data without confirmPassword
+        body: JSON.stringify(dataToSend), 
       });
 
       const data = await response.json();
