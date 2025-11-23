@@ -19,8 +19,13 @@
   },
   "homepage": "https://github.com/element18Ar/Trading-System#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.3",
     "concurrently": "^9.2.1",
+    "cors": "^2.8.5",
     "dotenv-flow": "^4.1.0",
-    "mongoose": "^8.20.0"
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.20.1"
   }
 }
