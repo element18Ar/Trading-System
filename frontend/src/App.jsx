@@ -1,28 +1,17 @@
-import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import './App.css';
-
-// Correct page imports (ALL from ./pages/)
-import CatalogPage from './pages/CatalogPage';
-import CreateItemPage from './pages/CreateItemPage';
-import LoginPage from './pages/LoginPage.jsx';
-import RegisterPage from './pages/RegisterPage.jsx';
-
-import NotFoundPage from './pages/NotFoundPage.jsx'; // REQUIRED
+import { useState } from 'react'
+import './App.css'
+import { Route } from 'react-router-dom';
 
 function App() {
   const [user, setUser] = useState(null);
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<CatalogPage />} />
-        <Route path="/list" element={<CreateItemPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        {/* Catch-all */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+    <Router>  
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/" element={<Home />} />
+    </Routes>
     </Router>
   );
 }
