@@ -1,17 +1,19 @@
-import { useState } from 'react'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Route } from 'react-router-dom';
+import './App.css'
+
+import Homepage from "./pages/homepage.jsx";
+import Login from "./pages/loginpage.jsx";
+import Register from "./pages/registerpage.jsx";
 
 function App() {
-  const [user, setUser] = useState(null);
-
   return (
-    <Router>  
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/" element={<Home />} />
-    </Routes>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Homepage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
     </Router>
   );
 }
