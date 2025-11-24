@@ -2,44 +2,40 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
 import { registerUser } from "../api/auth.js";
 
-
-
 // Custom hook to detect screen size for responsive styling
 const useScreenSize = () => {
-  const [width, setWidth] = useState(window.innerWidth);
+  const [width, setWidth] = useState(window.innerWidth);
 
-  useEffect(() => {
-    const handleResize = () => setWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-  const isMobile = width < 768; 
-  return { width, isMobile };
+  const isMobile = width < 768; 
+  return { width, isMobile };
 };
 
 export default function Register() {
-  const { isMobile } = useScreenSize();
+  const { isMobile } = useScreenSize();
   const navigate = useNavigate(); // Hook for routing
 
-  // --- STATE FOR FORM DATA AND API COMMUNICATION ---
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  });
+  // --- STATE FOR FORM DATA AND API COMMUNICATION ---
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
   const { username, email, password, confirmPassword } = formData;
 
-
-  // --- HANDLERS ---
+  // --- HANDLERS ---
   const handleChange = (e) => {
-    // Update state when user types in any input field
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,42 +44,41 @@ export default function Register() {
 
     // 1. Client-Side Validation: Check password match
     if (password !== confirmPassword) {
-        setError('Passwords do not match.');
-        setLoading(false);
-        return;
+      setError('Passwords do not match.');
+      setLoading(false);
+      return;
     }
 
     try {
-        // 2. API Call (using the service function)
-        const response = await registerUser(formData);
-        
-        // 3. Handle Success (201 Created)
-        console.log("Registration successful:", response.data);
-        alert("Registration successful!");
-        
-        // Redirect user to the login page after success
-        navigate('/dashboard'); 
+      // 2. API Call
+      const response = await registerUser(formData);
+
+      localStorage.setItem("authToken", response.data.token);
+      localStorage.setItem("userId", response.data.user._id);
+      
+      // 3. Handle Success
+      console.log("Registration successful:", response.data);
+      alert("Registration successful!");
+      
+      // Redirect user to dashboard or login page
+      navigate('/dashboard'); 
 
     } catch (err) {
-        // 4. Handle Failure (e.g., 400 Bad Request)
-        console.error("Registration failed:", err.response || err);
-        
-        // Extract the error message from the backend response
-        const errorMessage = err.response?.data?.message || 'Network error. Please try again.';
-        setError(errorMessage);
-
+      console.error("Registration failed:", err.response || err);
+      const errorMessage = err.response?.data?.message || 'Network error. Please try again.';
+      setError(errorMessage);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
-  // Define Colors for consistency with Homepage
+  // --- COLORS ---
   const COLOR_PRIMARY_DARK = "#2C2D2D"; 
-  const COLOR_CARD_BG = "#3E3F3F"; // Card background
-  const COLOR_ACCENT = "#00BFA5"; // Vibrant Teal/Cyan (Primary Button)
-  const COLOR_INPUT_BG = "#303030"; // Slightly darker background for better contrast
-  const COLOR_INPUT_BORDER = "#8A8C8C"; // Medium Gray for input borders
-  const COLOR_TEXT_LIGHT = "white"; // Main text color
+  const COLOR_CARD_BG = "#3E3F3F"; 
+  const COLOR_ACCENT = "#00BFA5"; 
+  const COLOR_INPUT_BG = "#303030"; 
+  const COLOR_INPUT_BORDER = "#8A8C8C"; 
+  const COLOR_TEXT_LIGHT = "white"; 
 
   // Responsive Style Variables
   const cardPadding = isMobile ? "2rem 1.5rem" : "2.5rem 2.5rem"; 
@@ -107,7 +102,7 @@ export default function Register() {
         position: "relative",
       }}
     >
-      {/* Background Texture for visual depth */}
+      {/* Background Texture */}
       <div 
         style={{
           position: "absolute",
@@ -149,16 +144,30 @@ export default function Register() {
           </p>
         </header>
 
-        {/* Form Fields - Add onSubmit handler to the form */}
+        {error && (
+          <div style={{ color: "red", marginBottom: "1rem" }}>
+            {error}
+          </div>
+        )}
+
+        {/* Form Fields */}
         <form 
             style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
-            onSubmit={handleSubmit} // ⬅️ Handle form submission
+            onSubmit={handleSubmit}
         >
-          {['Username', 'Email', 'Password', 'Confirm Password'].map((field, index) => (
+          {[
+            { label: "Username", name: "username", type: "text" },
+            { label: "Email", name: "email", type: "email" },
+            { label: "Password", name: "password", type: "password" },
+            { label: "Confirm Password", name: "confirmPassword", type: "password" },
+          ].map((field, index) => (
             <input
               key={index}
-              type={field.includes('Password') ? 'password' : (field === 'Email' ? 'email' : 'text')}
-              placeholder={field}
+              name={field.name}
+              type={field.type}
+              placeholder={field.label}
+              value={formData[field.name]}
+              onChange={handleChange}
               style={{
                 width: "calc(100% - 24px)",
                 height: inputHeight,
@@ -170,7 +179,6 @@ export default function Register() {
                 fontSize: "1rem",
                 transition: "border-color 0.3s ease, box-shadow 0.3s ease",
               }}
-              // Inline Focus and Blur handlers for the accent glow effect
               onFocus={(e) => {
                 e.target.style.borderColor = COLOR_ACCENT;
                 e.target.style.boxShadow = `0 0 0 2px rgba(0, 191, 165, 0.5)`; 
@@ -182,16 +190,17 @@ export default function Register() {
             />
           ))}
 
-          {/* REGISTER BUTTON (Primary CTA) */}
+          {/* REGISTER BUTTON */}
           <button
-            type="submit" // ⬅️ Ensure this is type="submit"
+            type="submit"
+            disabled={loading}
             style={{
               backgroundColor: COLOR_ACCENT,
               padding: "1.1rem 2.8rem",
               color: COLOR_PRIMARY_DARK,
               border: "none",
               borderRadius: "10px",
-              cursor: "pointer",
+              cursor: loading ? "not-allowed" : "pointer",
               fontSize: buttonFontSize,
               fontWeight: 700,
               width: "100%",
@@ -199,11 +208,12 @@ export default function Register() {
               transition: "background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease",
               boxShadow: "0 4px 15px rgba(0, 191, 165, 0.4)",
             }}
-            // Hover states for enhanced interactivity
             onMouseOver={(e) => {
-              e.target.style.backgroundColor = "#00E0C0";
-              e.target.style.transform = "translateY(-2px)";
-              e.target.style.boxShadow = "0 6px 20px rgba(0, 191, 165, 0.6)";
+              if (!loading) {
+                e.target.style.backgroundColor = "#00E0C0";
+                e.target.style.transform = "translateY(-2px)";
+                e.target.style.boxShadow = "0 6px 20px rgba(0, 191, 165, 0.6)";
+              }
             }}
             onMouseOut={(e) => {
               e.target.style.backgroundColor = COLOR_ACCENT;
@@ -211,7 +221,7 @@ export default function Register() {
               e.target.style.boxShadow = "0 4px 15px rgba(0, 191, 165, 0.4)";
             }}
           >
-            Register Now
+            {loading ? "Registering..." : "Register Now"}
           </button>
         </form>
 
