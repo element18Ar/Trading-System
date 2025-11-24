@@ -1,13 +1,12 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App';
+import App from './App.jsx';   // <-- Ensure this matches your actual filename
 import './index.css';
 
-// Make sure index.html contains <div id="root"></div>
 const container = document.getElementById('root');
+
 if (!container) {
-  // Helpful debug message if root missing
-  console.error('Root element not found: make sure public/index.html contains <div id="root"></div>');
+  console.error('Root element not found: make sure index.html contains <div id="root"></div>');
 } else {
   const root = createRoot(container);
   root.render(
