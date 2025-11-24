@@ -1,31 +1,38 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenvFlow from "dotenv-flow";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+
 import connectDB from "../config/db.js"; 
-
 import { loadEnv } from "../config/loadEnv.js";
-loadEnv(import.meta.url, dotenvFlow);
 
-// ---------------------------------------------------------
-// FIX: Use './' instead of '../' for local folders for local routes
-// ---------------------------------------------------------
 import authRoutes from './routes/authRoutes.js'; 
 import userRoutes from './routes/userRoutes.js';
-// (Note: No import for trade/message routes here)
-// ---------------------------------------------------------
 
+// Load environment variables
+loadEnv(import.meta.url, dotenvFlow);
+
+// Create Express app
 const app = express();
-app.use(express.json()); 
 
-// routes
+// Middleware
+app.use(express.json());
+app.use(cookieParser()); // ✅ Must come after app is created
+app.use(cors({
+  origin: "http://localhost:5173", // Frontend URL
+  credentials: true,
+}));
+
+// Routes
 app.use('/api/auth', authRoutes); 
 app.use('/api/users', userRoutes);
-// (Note: No mounting for /api/trading here)
 
-// Example route
+// Test route
 app.get("/", (req, res) => {
   res.send("Auth Server and MongoDB are working!");
 });
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

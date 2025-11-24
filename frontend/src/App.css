@@ -1,9 +1,23 @@
+/* CORRECTED App.css */
+
+/* Remove size limits and padding from #root so the homepage can fill the screen */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  /* max-width: 1280px; <-- REMOVE THIS */
+  /* margin: 0 auto;     <-- REMOVE THIS (or keep 'margin: 0 auto;' if you want other content centered) */
+  /* padding: 2rem;      <-- REMOVE THIS */
   text-align: center;
 }
+
+/* This is the crucial global reset, which you added correctly */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%; 
+  /* Also a good idea to ensure the body background is dark in case of any gaps */
+  background-color: #0A0A0A; 
+}
+
+/* --- OTHER STYLES BELOW --- */
 
 .logo {
   height: 6em;
@@ -39,4 +53,4 @@
 
 .read-the-docs {
   color: #888;
-}
+} 
