@@ -185,6 +185,7 @@ export default function Homepage() {
           >
             Trade What You Have, Get What You Need.
           </h2>
+
           <p
             style={{
               opacity: 0.8,
@@ -194,7 +195,10 @@ export default function Homepage() {
               margin: isMobile ? "1.5rem auto 0" : "1.5rem 0 0",
             }}
           >
-            Connect with a vibrant community ready to swap skills, services, and physical items effortlessly, completely **without cash**. Redefine value through bartering.
+            Connect with a vibrant community ready to swap skills, services, and physical items effortlessly, completely
+            {/* Highlighted text using an inline style span */}
+            <span style={{ color: COLOR_ACCENT, fontWeight: 'bold' }}> without cash</span>.
+            Redefine value through bartering.
           </p>
 
           {/* CTA Buttons below text */}

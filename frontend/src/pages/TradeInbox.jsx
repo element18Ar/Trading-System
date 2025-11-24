@@ -20,8 +20,8 @@ export default function TradeInbox({ onSelectTrade }) {
 
     try {
       setLoading(true);
-      // NOTE: Ensure your backend runs on port 4001 as previously defined
-      const res = await fetch(`http://localhost:4001/api/trades/user/${userId}`);
+      // NOTE: Ensure your backend runs on port 5001 as previously defined
+      const res = await fetch(`http://localhost:5001/api/trades/user/${userId}`);
       
       if (!res.ok) throw new Error("Failed to fetch trades");
       
