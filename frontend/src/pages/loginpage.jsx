@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react"; // Import Eye icons
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
+import { Eye, EyeOff } from "lucide-react";
 
 // Custom hook to detect screen size (kept consistent)
 const useScreenSize = () => {
     const [width, setWidth] = useState(window.innerWidth);
-    // ... useEffect remains the same ...
+    
     useEffect(() => {
         const handleResize = () => setWidth(window.innerWidth);
         window.addEventListener('resize', handleResize);
@@ -17,13 +17,14 @@ const useScreenSize = () => {
 
 export default function Login() {
     const { isMobile } = useScreenSize();
-    const [showPassword, setShowPassword] = useState(false); // New state for password toggle
+    const navigate = useNavigate(); // Initialize useNavigate hook
+    const [showPassword, setShowPassword] = useState(false);
 
     // Define Colors (kept consistent)
     const COLOR_PRIMARY_DARK = "#2C2D2D"; 
     const COLOR_CARD_BG = "#3E3F3F"; 
     const COLOR_ACCENT = "#00BFA5"; 
-    const COLOR_INPUT_BG = "#5A5B5B"; 
+    const COLOR_INPUT_BG = "#303030"; // Reverting to match register input background
     const COLOR_INPUT_BORDER = "#8A8C8C"; 
     const COLOR_TEXT_LIGHT = "white"; 
     
@@ -35,10 +36,10 @@ export default function Login() {
 
     // Reusable styles for the input element
     const inputStyle = {
-        width: "100%", // Full width of the container below
+        width: "100%",
         height: inputHeight,
         padding: "0 12px",
-        paddingRight: "40px", // Reserve space for the icon
+        paddingRight: "40px",
         backgroundColor: COLOR_INPUT_BG,
         color: COLOR_TEXT_LIGHT,
         border: `1px solid ${COLOR_INPUT_BORDER}`,
@@ -57,6 +58,20 @@ export default function Login() {
         e.target.style.boxShadow = 'none';
     };
 
+    // New function to handle form submission and navigation
+    const handleSubmit = (e) => {
+        e.preventDefault(); // Prevent the default form submission (page reload)
+        
+        // 💡 In a real app, you would handle:
+        // 1. Validating credentials (client-side)
+        // 2. Making an API call to authenticate the user
+        // 3. Storing authentication token/user data
+        
+        // Simulate successful login and navigate to the Dashboard
+        console.log("Login successful! Navigating to Dashboard...");
+        navigate("/dashboard"); // Redirects the user to the '/dashboard' route
+    };
+
     return (
         <div
             style={{
@@ -73,7 +88,7 @@ export default function Login() {
                 position: "relative",
             }}
         >
-            {/* Background Texture (for consistency) - omitted for brevity, but kept in original */}
+            {/* Background Texture (omitted for brevity) */}
 
             {/* LOGIN CARD */}
             <div
@@ -105,8 +120,11 @@ export default function Login() {
                     </p>
                 </header>
 
-                {/* Form Fields */}
-                <form style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {/* Form Fields - Add onSubmit handler to the form */}
+                <form 
+                    style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+                    onSubmit={handleSubmit} // ⬅️ Handle form submission
+                >
                     
                     {/* Username/Email Input */}
                     <input
@@ -124,8 +142,8 @@ export default function Login() {
                             placeholder="Password"
                             style={{
                                 ...inputStyle,
-                                width: "100%", // Ensure it fills the relative container
-                                paddingRight: "40px", // Pad for the icon
+                                width: "100%",
+                                paddingRight: "40px",
                             }}
                             onFocus={handleFocus}
                             onBlur={handleBlur}
@@ -153,7 +171,7 @@ export default function Login() {
 
                     {/* LOGIN BUTTON (Primary CTA) */}
                     <button
-                        type="submit"
+                        type="submit" // ⬅️ Ensure this is type="submit"
                         style={{
                             backgroundColor: COLOR_ACCENT,
                             padding: "1.1rem 2.8rem",
