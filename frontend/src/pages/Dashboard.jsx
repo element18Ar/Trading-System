@@ -29,7 +29,7 @@ const MarketplaceHome = () => {
   useEffect(() => {
     setLoading(true);
     // Fetch all items (no seller ID filter)
-    fetch("http://localhost:5002/api/product-service/items")
+    fetch("http://localhost:5001/api/product-service/items")
       .then(res => res.json())
       .then(data => {
         // Assuming data.data.items holds the array of products
