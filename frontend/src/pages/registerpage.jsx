@@ -91,14 +91,28 @@ export default function Register() {
   const inputHeight = isMobile ? "2.8rem" : "3.2rem";
   const buttonFontSize = isMobile ? "1.05rem" : "1.2rem";
 
+  // New function to handle form submission and navigation
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevent the default form submission (page reload)
+    
+    // 💡 In a real app, you would handle:
+    // 1. Form validation
+    // 2. API call to register the user
+    // 3. Handling success/error states
+
+    // Simulate successful registration and navigate to the Dashboard
+    console.log("Registration successful! Navigating to Dashboard...");
+    navigate("/dashboard"); // Redirects the user to the '/dashboard' route
+  };
+
   return (
     <div
       style={{
         width: "100vw",
         minHeight: "100vh",
-        background: `linear-gradient(135deg, #121212 0%, #000000 100%)`, // Deep rich black gradient
+        background: `linear-gradient(135deg, #121212 0%, #000000 100%)`,
         padding: containerPadding,
-        fontFamily: "'Inter', 'Roboto', 'Helvetica Neue', sans-serif", // Matching font
+        fontFamily: "'Inter', 'Roboto', 'Helvetica Neue', sans-serif",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -124,12 +138,12 @@ export default function Register() {
         style={{
           backgroundColor: COLOR_CARD_BG,
           padding: cardPadding,
-          borderRadius: "20px", // Soft, modern corners
+          borderRadius: "20px",
           color: COLOR_TEXT_LIGHT,
           maxWidth: "400px", 
           width: isMobile ? "90%" : "100%",
           textAlign: "center",
-          boxShadow: "0 15px 40px rgba(0, 0, 0, 0.6)", // Pronounced shadow
+          boxShadow: "0 15px 40px rgba(0, 0, 0, 0.6)",
           zIndex: 1,
         }}
       >
@@ -149,15 +163,18 @@ export default function Register() {
           </p>
         </header>
 
-        {/* Form Fields */}
-        <form style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {/* Form Fields - Add onSubmit handler to the form */}
+        <form 
+            style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+            onSubmit={handleSubmit} // ⬅️ Handle form submission
+        >
           {['Username', 'Email', 'Password', 'Confirm Password'].map((field, index) => (
             <input
               key={index}
               type={field.includes('Password') ? 'password' : (field === 'Email' ? 'email' : 'text')}
               placeholder={field}
               style={{
-                width: "calc(100% - 24px)", // 100% minus 12px padding on each side
+                width: "calc(100% - 24px)",
                 height: inputHeight,
                 padding: "0 12px",
                 backgroundColor: COLOR_INPUT_BG,
@@ -181,7 +198,7 @@ export default function Register() {
 
           {/* REGISTER BUTTON (Primary CTA) */}
           <button
-            type="submit"
+            type="submit" // ⬅️ Ensure this is type="submit"
             style={{
               backgroundColor: COLOR_ACCENT,
               padding: "1.1rem 2.8rem",

@@ -59,7 +59,7 @@ export default function Homepage() {
         }}
       >
         <h3 style={{ margin: 0, color: COLOR_ACCENT, fontWeight: 800, letterSpacing: "1px" }}>
-          SWAP.IO
+          SWAP.TA
         </h3>
 
         {/* Desktop Links */}
@@ -173,7 +173,7 @@ export default function Homepage() {
               textShadow: `0 0 10px rgba(0, 191, 165, 0.3)`,
             }}
           >
-            The **Future** of Exchange.
+            The <span style={{ color: COLOR_ACCENT }}>Future</span> of Exchange.
           </h1>
           <h2
             style={{
