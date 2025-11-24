@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/element18Ar/Trading-System#readme",
   "dependencies": {
+    "axios": "^1.13.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
     "concurrently": "^9.2.1",
