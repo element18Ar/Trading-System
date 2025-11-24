@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios"; // Import axios for API calls
 
 // Custom hook to detect screen size for responsive styling
 const useScreenSize = () => {
@@ -15,11 +16,16 @@ const useScreenSize = () => {
   return { width, isMobile };
 };
 
+// --- API CALL FUNCTION ---
+const registerUser = async (data) => {
+  return await axios.post("http://localhost:5000/api/auth/register", data);
+  // Change URL if your backend is hosted elsewhere
+};
+
 export default function Register() {
   const { isMobile } = useScreenSize();
-  const navigate = useNavigate(); // Hook for routing
+  const navigate = useNavigate();
 
-  // --- STATE FOR FORM DATA AND API COMMUNICATION ---
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -28,10 +34,9 @@ export default function Register() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   const { username, email, password, confirmPassword } = formData;
 
-  // --- HANDLERS ---
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -41,7 +46,6 @@ export default function Register() {
     setError(null);
     setLoading(true);
 
-    // 1. Client-Side Validation: Check password match
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
       setLoading(false);
@@ -49,19 +53,15 @@ export default function Register() {
     }
 
     try {
-      // 2. API Call
       const response = await registerUser(formData);
 
       localStorage.setItem("authToken", response.data.token);
       localStorage.setItem("userId", response.data.user._id);
-      
-      // 3. Handle Success
+
       console.log("Registration successful:", response.data);
       alert("Registration successful!");
-      
-      // Redirect user to dashboard or login page
-      navigate('/dashboard'); 
 
+      navigate('/dashboard'); 
     } catch (err) {
       console.error("Registration failed:", err.response || err);
       const errorMessage = err.response?.data?.message || 'Network error. Please try again.';
@@ -79,7 +79,6 @@ export default function Register() {
   const COLOR_INPUT_BORDER = "#8A8C8C"; 
   const COLOR_TEXT_LIGHT = "white"; 
 
-  // Responsive Style Variables
   const cardPadding = isMobile ? "2rem 1.5rem" : "2.5rem 2.5rem"; 
   const containerPadding = isMobile ? "1rem" : "2rem";
   const inputHeight = isMobile ? "2.8rem" : "3.2rem";
@@ -154,7 +153,7 @@ export default function Register() {
             style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
             onSubmit={handleSubmit}
         >
-          {[
+          {[ 
             { label: "Username", name: "username", type: "text" },
             { label: "Email", name: "email", type: "email" },
             { label: "Password", name: "password", type: "password" },
