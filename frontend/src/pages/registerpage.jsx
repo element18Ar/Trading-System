@@ -59,10 +59,10 @@ export default function Register() {
         
         // 3. Handle Success (201 Created)
         console.log("Registration successful:", response.data);
-        alert("Registration successful! Redirecting to login...");
+        alert("Registration successful!");
         
         // Redirect user to the login page after success
-        navigate('/login'); 
+        navigate('/dashboard'); 
 
     } catch (err) {
         // 4. Handle Failure (e.g., 400 Bad Request)
@@ -90,20 +90,6 @@ export default function Register() {
   const containerPadding = isMobile ? "1rem" : "2rem";
   const inputHeight = isMobile ? "2.8rem" : "3.2rem";
   const buttonFontSize = isMobile ? "1.05rem" : "1.2rem";
-
-  // New function to handle form submission and navigation
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent the default form submission (page reload)
-    
-    // 💡 In a real app, you would handle:
-    // 1. Form validation
-    // 2. API call to register the user
-    // 3. Handling success/error states
-
-    // Simulate successful registration and navigate to the Dashboard
-    console.log("Registration successful! Navigating to Dashboard...");
-    navigate("/dashboard"); // Redirects the user to the '/dashboard' route
-  };
 
   return (
     <div
