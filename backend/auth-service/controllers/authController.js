@@ -1,9 +1,7 @@
 import User from '../models/user.js';
 import jwt from 'jsonwebtoken';
 
-/* ============================
-   REGISTER USER
-============================= */
+//register user
 export const Register = async (req, res) => {
   try {
     const { username, email, password, confirmPassword } = req.body;
@@ -39,10 +37,7 @@ export const Register = async (req, res) => {
 };
 
 
-
-/* ============================
-   LOGIN USER
-============================= */
+//login user
 export const Login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -93,5 +88,29 @@ export const Login = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: 'Login failed', error: error.message });
+  }
+};
+
+export const RefreshToken = async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({ message: 'No refresh token provided' });
+    }
+
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+      if (err) return res.status(403).json({ message: 'Invalid refresh token' });
+
+      const accessToken = jwt.sign(
+        { id: decoded.id, role: decoded.role },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: '15m' }
+      );
+
+      res.json({ accessToken });
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to refresh token', error: error.message });
   }
 };
