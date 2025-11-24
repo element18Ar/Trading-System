@@ -1,23 +1,81 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // Assuming you use React Router
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom"; 
+import { registerUser } from "../api/auth.js";
+
+
 
 // Custom hook to detect screen size for responsive styling
 const useScreenSize = () => {
-  const [width, setWidth] = useState(window.innerWidth);
+  const [width, setWidth] = useState(window.innerWidth);
 
-  useEffect(() => {
-    const handleResize = () => setWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
-  // Using 768px as the mobile breakpoint for the form layout
-  const isMobile = width < 768; 
-  return { width, isMobile };
+  const isMobile = width < 768; 
+  return { width, isMobile };
 };
 
 export default function Register() {
-  const { isMobile } = useScreenSize();
+  const { isMobile } = useScreenSize();
+  const navigate = useNavigate(); // Hook for routing
+
+  // --- STATE FOR FORM DATA AND API COMMUNICATION ---
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  
+  const { username, email, password, confirmPassword } = formData;
+
+
+  // --- HANDLERS ---
+  const handleChange = (e) => {
+    // Update state when user types in any input field
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    // 1. Client-Side Validation: Check password match
+    if (password !== confirmPassword) {
+        setError('Passwords do not match.');
+        setLoading(false);
+        return;
+    }
+
+    try {
+        // 2. API Call (using the service function)
+        const response = await registerUser(formData);
+        
+        // 3. Handle Success (201 Created)
+        console.log("Registration successful:", response.data);
+        alert("Registration successful! Redirecting to login...");
+        
+        // Redirect user to the login page after success
+        navigate('/login'); 
+
+    } catch (err) {
+        // 4. Handle Failure (e.g., 400 Bad Request)
+        console.error("Registration failed:", err.response || err);
+        
+        // Extract the error message from the backend response
+        const errorMessage = err.response?.data?.message || 'Network error. Please try again.';
+        setError(errorMessage);
+
+    } finally {
+        setLoading(false);
+    }
+  };
 
   // Define Colors for consistency with Homepage
   const COLOR_PRIMARY_DARK = "#2C2D2D"; 
