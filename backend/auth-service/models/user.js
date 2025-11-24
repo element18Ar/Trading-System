@@ -7,21 +7,31 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+
   role: {
     type: String,
     enum: ['user', 'admin'],
     default: 'user',
     required: true,
   },
+
   email: {
     type: String,
     required: true,
     unique: true,
   },
+
   password: {
     type: String,
     required: true,
   },
+
+  // ⭐ Add this to support refresh token storage
+  refreshTokens: {
+    type: [String],
+    default: [],
+  }
+
 }, {
   timestamps: true,
 });
@@ -30,7 +40,7 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
 
-  this.password = await bcrypt.hash(this.password, 10); // salt rounds = 10
+  this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
