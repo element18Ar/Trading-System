@@ -2,6 +2,9 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenvFlow from "dotenv-flow";
 import connectDB from "../config/db.js";
+import dotenv from "dotenv-flow";
+dotenv.config();
+
 
 
 //Ako gi import ang product-service routes

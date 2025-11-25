@@ -7,3 +7,4 @@ router.get('/', getUsers);          // View all users
 router.get('/:id', getUserById);     // View one user by ID
 
 export default router;
+

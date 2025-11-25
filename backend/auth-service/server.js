@@ -10,6 +10,10 @@ import { loadEnv } from "../config/loadEnv.js";
 import authRoutes from './routes/authRoutes.js'; 
 import userRoutes from './routes/userRoutes.js';
 
+import dotenv from "dotenv-flow";
+dotenv.config();
+
+
 // Load environment variables
 loadEnv(import.meta.url, dotenvFlow);
 

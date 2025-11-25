@@ -1,5 +1,7 @@
 import Trade from '../models/trade.js';
-import Item from '../../product-service/models/Item.js'; // Make sure this path is correct
+import Message from '../models/message.js'; // 👈 NEW: Import Message model
+//import User from '../../auth-service/models/user.js'; // 👈 NEW: Import User model (Adjust path as needed)
+import Item from '../../product-service/models/Item.js';// Make sure this path is correct
 
 export const createTrade = async (req, res) => {
   try {
@@ -103,4 +105,81 @@ export const getUserTrades = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+};
+
+/**
+ * Helper function to structure the trade and message data for the export file.
+ * We assume populated fields (initiator, receiver, items) have 'username' and 'name' properties.
+ */
+const formatTradeForExport = (trade, messages) => {
+    const { _id, initiator, receiver, status, cashOffer, createdAt, lastActivity } = trade;
+
+    const initiatorName = initiator?.username || `User ID: ${initiator?._id}`;
+    const receiverName = receiver?.username || `User ID: ${receiver?._id}`;
+    
+    // Convert arrays of item objects into a single, delimited string
+    const initiatorItemNames = trade.initiatorItems.map(item => item?.name || item?._id).join('; ');
+    const receiverItemNames = trade.receiverItems.map(item => item?.name || item?._id).join('; ');
+
+    // Format the entire chat history into a single log string
+    const chatTranscript = messages
+        .map(msg => {
+            const senderName = msg.sender?.username || 'System/Unknown';
+            return `${msg.createdAt.toISOString()} | ${senderName}: ${msg.content}`;
+        })
+        .join('\n'); // Use newline to separate messages
+
+    return {
+        TradeID: _id.toString(),
+        Status: status,
+        Initiator: initiatorName,
+        Receiver: receiverName,
+        Initiator_Items: initiatorItemNames,
+        Receiver_Items: receiverItemNames,
+        Cash_Offer_Amount: cashOffer?.amount || 0,
+        Cash_Offer_Currency: cashOffer?.currency?.toUpperCase() || 'PHP',
+        Proposed_Date: createdAt.toISOString(),
+        Last_Activity: lastActivity.toISOString(),
+        Negotiation_Transcript: chatTranscript 
+    };
+};
+
+/**
+ * @desc    Fetches and prepares all completed trades and their chat logs for export.
+ * @route   GET /api/negotiation/trades/export
+ * @access  Private (Should be restricted to admin/privileged users)
+ */
+export const exportTransactions = async (req, res) => {
+    try {
+        // 1. Fetch completed trades. Populate fields needed for the export.
+        const trades = await Trade.find({ status: 'completed' })
+            .populate('initiator', 'username') 
+            .populate('receiver', 'username') 
+            .populate('initiatorItems', 'name') 
+            .populate('receiverItems', 'name') 
+            .sort({ createdAt: -1 })
+            .lean(); 
+
+        const exportedData = [];
+
+        // 2. Loop through each trade to fetch its associated messages
+        for (const trade of trades) {
+            const messages = await Message.find({ tradeId: trade._id })
+                .populate('sender', 'username') 
+                .sort({ createdAt: 1 })
+                .lean();
+
+            // 3. Format the data
+            const formattedTrade = formatTradeForExport(trade, messages);
+            exportedData.push(formattedTrade);
+        }
+        
+        // 4. Send the structured data back as JSON
+        res.status(200).json(exportedData);
+
+    } catch (error) {
+        // Log the error for server-side debugging
+        console.error('Error during transaction export:', error); 
+        res.status(500).json({ message: 'Failed to export transactions', error: error.message });
+    }
 };
