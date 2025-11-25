@@ -1,3 +1,6 @@
+import dotenv from "dotenv-flow";
+dotenv.config();
+
 import express from "express";
 import mongoose from "mongoose";
 import dotenvFlow from "dotenv-flow";
@@ -8,8 +11,7 @@ import { loadEnv } from "../config/loadEnv.js";
 
 import messageRoutes from "./routes/messageRoutes.js";
 import tradeRoutes from "./routes/tradeRoutes.js";
-import dotenv from "dotenv-flow";
-dotenv.config();
+
 
 loadEnv(import.meta.url, dotenvFlow);
 

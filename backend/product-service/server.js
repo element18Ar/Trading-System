@@ -6,7 +6,6 @@ import dotenv from "dotenv-flow";
 dotenv.config();
 
 
-
 //Ako gi import ang product-service routes
 import itemRoutes from "./routes/itemRoutes.js";// Note: Use the full path and .js extension
 
