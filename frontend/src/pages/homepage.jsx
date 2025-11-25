@@ -81,7 +81,7 @@ export default function Homepage() {
                   border: `1px solid ${COLOR_SECONDARY_BUTTON_BORDER}`,
                   padding: "0.5rem 1.5rem",
                   color: "white",
-                  borderRadius: "8px",
+                  borderRadius: "8px", 
                   cursor: "pointer",
                   transition: "background-color 0.3s",
                 }}
@@ -185,7 +185,6 @@ export default function Homepage() {
           >
             Trade What You Have, Get What You Need.
           </h2>
-
           <p
             style={{
               opacity: 0.8,
@@ -195,10 +194,7 @@ export default function Homepage() {
               margin: isMobile ? "1.5rem auto 0" : "1.5rem 0 0",
             }}
           >
-            Connect with a vibrant community ready to swap skills, services, and physical items effortlessly, completely
-            {/* Highlighted text using an inline style span */}
-            <span style={{ color: COLOR_ACCENT, fontWeight: 'bold' }}> without cash</span>.
-            Redefine value through bartering.
+            Connect with a vibrant community ready to swap skills, services, and physical items effortlessly, completely **without cash**. Redefine value through bartering.
           </p>
 
           {/* CTA Buttons below text */}
