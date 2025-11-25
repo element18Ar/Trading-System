@@ -21,9 +21,9 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cookieParser()); // ✅ Must come after app is created
+app.use(cookieParser());
 app.use(cors({
-  origin: "http://localhost:5173", // Frontend URL
+  origin: "http://localhost:5173",
   credentials: true,
 }));
 
@@ -36,9 +36,14 @@ app.get("/", (req, res) => {
   res.send("Auth Server and MongoDB are working!");
 });
 
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  connectDB(mongoose);
-  console.log(`Server running on http://localhost:${PORT}`)
-});
+// Connect to MongoDB first
+connectDB(mongoose)
+  .then(() => {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to connect to MongoDB:", err);
+  });
