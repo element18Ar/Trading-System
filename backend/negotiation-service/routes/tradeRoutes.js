@@ -3,8 +3,10 @@ import {
   createTrade, getTradeDetails, updateTradeOffer, 
   updateTradeStatus, getUserTrades, exportTransactions 
 } from '../controllers/tradeController.js';
+import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
+router.use(verifyToken);
 
 router.post('/', createTrade);
 router.get('/user/:userId', getUserTrades);

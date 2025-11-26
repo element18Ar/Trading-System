@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import jwt from "jsonwebtoken";
 
 import connectDB from "../config/db.js";
 import { loadEnv } from "../config/loadEnv.js";
@@ -12,21 +13,55 @@ loadEnv(import.meta.url);
 
 const app = express();
 
+// Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
 
+// Root Test Route
 app.get("/", (req, res) => res.send("Negotiation Service is operational."));
 
+// Routes
 app.use("/api/messages", messageRoutes);
 app.use("/api/trades", tradeRoutes);
 
+// ======================= TOKEN EXCHANGE ======================= //
+app.post("/api/token/exchange", (req, res) => {
+  const authHeader = req.headers.authorization || req.headers.Authorization;
+  
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "No token provided" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET);
+
+    const serviceToken = jwt.sign(
+      { id: decoded.id, role: decoded.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "2h" }
+    );
+
+    return res.json({ token: serviceToken });
+  } catch (err) {
+    return res.status(403).json({ message: "Invalid or expired token" });
+  }
+});
+
+// ======================= DATABASE + SERVER START ======================= //
+const PORT = process.env.PORT || 5002;
+
 connectDB(mongoose)
   .then(() => {
-    const PORT = process.env.PORT || 5002;
-    app.listen(PORT, () => {
-      console.log(`Negotiation Service running at http://localhost:${PORT}`);
-    });
+    app.listen(PORT, () =>
+      console.log(`Negotiation Service running at http://localhost:${PORT}`)
+    );
   })
   .catch((err) => {
-    console.error("Failed to connect to MongoDB:", err);
+    console.error("Failed to connect to MongoDB for negotiation-service:", err);
+    process.exit(1);
   });

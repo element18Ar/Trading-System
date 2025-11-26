@@ -26,8 +26,10 @@ const AddItemContent = ({ onSuccess }) => {
     formData.append('price', 0);
 
     try {
+      const token = localStorage.getItem("productServiceToken") || localStorage.getItem("authToken");
       const res = await fetch("http://localhost:5001/api/v1/products/items", {
         method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData
       });
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);

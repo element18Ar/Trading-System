@@ -41,10 +41,13 @@ const initialUserDetails = {
     const fetchUserItems = async () => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:5001/api/v1/products/items");
+        const token = localStorage.getItem("productServiceToken") || localStorage.getItem("authToken");
+        const res = await fetch("http://localhost:5001/api/v1/products/items", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
-        const itemsArray = Array.isArray(data.items) ? data.items : [];
+        const itemsArray = Array.isArray(data?.data?.items) ? data.data.items : (Array.isArray(data?.items) ? data.items : []);
         const filtered = itemsArray.filter(i => i.seller === userId);
         setItems(filtered);
       } catch (error) {
