@@ -96,9 +96,11 @@ export default function Login() {
       // Store access token and user info
       localStorage.setItem("authToken", response.data.accessToken);
       localStorage.setItem("userId", response.data.user._id);
+      localStorage.setItem("user", JSON.stringify(response.data.user)); //newly addded
+
 
       console.log("Login successful!", response.data);
-      navigate("/dashboard");
+      navigate(`/dashboard/${response.data.user._id}`); //newly added
     } catch (err) {
       console.error("Login failed:", err.response || err);
       setError(
