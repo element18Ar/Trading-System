@@ -33,8 +33,8 @@ app.post("/api/token/exchange", (req, res) => {
   }
   const token = authHeader.split(" ")[1];
   try {
-    const accessSecret = process.env.ACCESS_TOKEN_SECRET;
-    const serviceSecret = process.env.JWT_SECRET;
+    const accessSecret = process.env.ACCESS_TOKEN_SECRET || 'dev_secret_key';
+    const serviceSecret = process.env.JWT_SECRET || 'dev_secret_key';
     let decoded;
     if (accessSecret) {
       try { decoded = jwt.verify(token, accessSecret); } catch {}

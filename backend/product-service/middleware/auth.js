@@ -8,8 +8,8 @@ export const verifyToken = (req, res, next) => {
 
   const token = authHeader.split(' ')[1]
   try {
-    const accessSecret = process.env.ACCESS_TOKEN_SECRET
-    const serviceSecret = process.env.JWT_SECRET
+    const accessSecret = process.env.ACCESS_TOKEN_SECRET || 'dev_secret_key'
+    const serviceSecret = process.env.JWT_SECRET || 'dev_secret_key'
     let verified
     if (accessSecret) {
       try { verified = jwt.verify(token, accessSecret) } catch {}
