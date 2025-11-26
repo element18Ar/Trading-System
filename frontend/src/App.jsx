@@ -18,7 +18,7 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         {/* Core Authenticated Dashboard Route */}
-        <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/dashboard/:userId" element={<Dashboard />} />
 
         {/* If needed later:
           <Route path="*" element={<NotFound />} />

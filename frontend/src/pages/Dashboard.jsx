@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from "axios";
 import { PlusCircle, User, Home, MessageSquare, LogOut } from "lucide-react";
 
 import MarketplaceHome from "./MarketplaceHome.jsx";
@@ -22,8 +23,24 @@ const BASE_STYLES = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { userId } = useParams(); // ✅ Correct location
+  const [user, setUser] = useState(null); // store fetched user
   const [currentView, setCurrentView] = useState("Home");
   const [selectedTrade, setSelectedTrade] = useState(null);
+
+  // ✅ Fetch user on load
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/auth/user/${userId}`);
+        setUser(res.data);
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+      }
+    };
+
+    fetchUser();
+  }, [userId]);
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
@@ -41,9 +58,12 @@ export default function Dashboard() {
   const renderContent = () => {
     switch (currentView) {
       case "AddItem": return <AddItemContent onSuccess={handleItemUploadSuccess} />;
-      case "Profile": return <UserProfileContent />;
+      case "Profile": return <UserProfileContent user={user} />;
       case "Inbox": return <TradeInbox onSelectTrade={handleViewTrade} />;
-      case "TradeDetail": return selectedTrade ? <TradeDetail tradeId={selectedTrade} onBack={() => setCurrentView('Inbox')} /> : <MarketplaceHome />;
+      case "TradeDetail": 
+        return selectedTrade 
+          ? <TradeDetail tradeId={selectedTrade} onBack={() => setCurrentView('Inbox')} />
+          : <MarketplaceHome />;
       case "Home":
       default: return <MarketplaceHome />;
     }
@@ -69,16 +89,27 @@ export default function Dashboard() {
   return (
     <div style={mainContainerStyle}>
       <aside style={sidebarStyle}>
-        <h2 style={{ marginBottom: "2rem", color: COLOR_ACCENT }}>SWAP.TA</h2>
+        <h2 style={{ marginBottom: "0.5rem", color: COLOR_ACCENT }}>SWAP.TA</h2>
+
+        {/* Display logged user name */}
+        {user && (
+          <p style={{ color: "#aaa", marginBottom: "2rem" }}>
+            Hello, <strong>{user.username}</strong>
+          </p>
+        )}
+
         <button style={navButtonStyle(currentView === "Home")} onClick={() => { setCurrentView("Home"); setSelectedTrade(null); }}><Home size={20} /> Marketplace</button>
         <button style={navButtonStyle(currentView === "AddItem")} onClick={() => { setCurrentView("AddItem"); setSelectedTrade(null); }}><PlusCircle size={20} /> Add Item</button>
         <button style={navButtonStyle(currentView === "Profile")} onClick={() => { setCurrentView("Profile"); setSelectedTrade(null); }}><User size={20} /> My Profile</button>
         <button style={navButtonStyle(currentView === "Inbox" || currentView === "TradeDetail")} onClick={() => { setCurrentView("Inbox"); setSelectedTrade(null); }}><MessageSquare size={20} /> Negotiations (Inbox)</button>
+
         <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid #444' }}>
           <button style={{ ...navButtonStyle(false, true), width: '100%' }} onClick={handleLogout}><LogOut size={20} /> Logout</button>
         </div>
       </aside>
+
       <main style={contentStyle}>{renderContent()}</main>
     </div>
   );
 }
+

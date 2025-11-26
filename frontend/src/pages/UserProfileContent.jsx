@@ -10,11 +10,21 @@ export default function UserProfileContent() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const initialUserDetails = {
-    username: "User-" + (userId ? userId.substring(0, 8) : "Guest"),
-    email: "user@example.com",
-    joinDate: new Date().toLocaleDateString()
-  };
+const storedUser = JSON.parse(localStorage.getItem("user"));
+
+const initialUserDetails = {
+  username: storedUser?.username || "Guest",
+  email: storedUser?.email || "guest@example.com",
+  joinDate: new Date().toLocaleDateString()
+};
+
+
+ // const initialUserDetails = {
+  //username: "User-" + (userId ? userId.substring(0, 8) : "Guest"),
+  //email: userId ? `user${userId.substring(0, 4)}@example.com` : "guest@example.com",
+  //joinDate: new Date().toLocaleDateString()
+//};
+
   const [userDetails, setUserDetails] = useState(initialUserDetails);
   const [isEditing, setIsEditing] = useState(false);
   const [newUsername, setNewUsername] = useState(initialUserDetails.username);
