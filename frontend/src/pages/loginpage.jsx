@@ -93,8 +93,10 @@ export default function Login() {
         password,
       });
 
-      // Store access token and user info
       localStorage.setItem("authToken", response.data.accessToken);
+      if (response.data.refreshToken) {
+        localStorage.setItem("refreshToken", response.data.refreshToken);
+      }
       localStorage.setItem("userId", response.data.user._id);
       localStorage.setItem("user", JSON.stringify(response.data.user)); //newly addded
 
