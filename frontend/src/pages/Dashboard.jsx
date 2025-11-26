@@ -32,7 +32,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/auth/user/${userId}`);
+        const res = await axios.get(`http://localhost:5000/api/users/${userId}`);
         setUser(res.data);
       } catch (err) {
         console.error("Failed to fetch user:", err);

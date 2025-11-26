@@ -19,7 +19,6 @@ const useScreenSize = () => {
 // --- API CALL FUNCTION ---
 const registerUser = async (data) => {
   return await axios.post("http://localhost:5000/api/auth/register", data);
-  // Change URL if your backend is hosted elsewhere
 };
 
 export default function Register() {
@@ -245,3 +244,4 @@ export default function Register() {
     </div>
   );
 }
+
