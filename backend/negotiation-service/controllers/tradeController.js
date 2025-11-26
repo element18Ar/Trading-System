@@ -1,7 +1,7 @@
 import Trade from '../models/trade.js';
-import Message from '../models/message.js'; // 👈 NEW: Import Message model
-//import User from '../../auth-service/models/user.js'; // 👈 NEW: Import User model (Adjust path as needed)
-import Item from '../../product-service/models/Item.js';// Make sure this path is correct
+import Message from '../models/message.js';
+import User from '../../auth-service/models/user.js';
+import Item from '../../product-service/models/Item.js';
 
 export const createTrade = async (req, res) => {
   try {
