@@ -57,11 +57,12 @@ export default function Register() {
 
       localStorage.setItem("authToken", response.data.token);
       localStorage.setItem("userId", response.data.user._id);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
 
       console.log("Registration successful:", response.data);
       alert("Registration successful!");
 
-      navigate('/dashboard'); 
+      navigate(`/dashboard/${response.data.user._id}`);
     } catch (err) {
       console.error("Registration failed:", err.response || err);
       const errorMessage = err.response?.data?.message || 'Network error. Please try again.';
