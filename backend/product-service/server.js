@@ -33,21 +33,20 @@ app.post("/api/token/exchange", (req, res) => {
   }
   const token = authHeader.split(" ")[1];
   try {
-    const accessSecret = process.env.ACCESS_TOKEN_SECRET || 'dev_secret_key';
-    const serviceSecret = process.env.JWT_SECRET || 'dev_secret_key';
-    let decoded;
-    if (accessSecret) {
-      try { decoded = jwt.verify(token, accessSecret); } catch {}
-    }
-    if (!decoded && serviceSecret) {
-      try { decoded = jwt.verify(token, serviceSecret); } catch {}
-    }
-    if (!decoded) {
-      return res.status(403).json({ message: "Invalid or expired token" });
+    const secret = process.env.JWT_SECRET || 'dev_secret_key';
+    const decoded = jwt.verify(token, secret);
+    if (decoded?.iss !== 'auth-service') {
+      return res.status(403).json({ message: 'Invalid token issuer' });
     }
     const serviceToken = jwt.sign(
-      { id: decoded.id, role: decoded.role },
-      serviceSecret || accessSecret,
+      {
+        sub: String(decoded.id),
+        id: String(decoded.id),
+        role: decoded.role,
+        iss: 'auth-service',
+        aud: ['product-service']
+      },
+      secret,
       { expiresIn: "2h" }
     );
     return res.json({ token: serviceToken });
