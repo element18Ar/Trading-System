@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors"; 
 import mongoose from "mongoose";
-import dotenvFlow from "dotenv-flow";
 import connectDB from "../config/db.js";
 import dotenv from "dotenv-flow";
 dotenv.config();
