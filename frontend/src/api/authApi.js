@@ -57,9 +57,11 @@ export const loginUser = async (credentials) => {
 // ----------------------------
 export const refreshToken = async () => {
   try {
+    const rt = localStorage.getItem("refreshToken");
     const response = await fetch(`${BACKEND_URL}/refresh`, {
       method: "POST",
-      credentials: "include", // Cookies must be sent
+      headers: rt ? { Authorization: `Bearer ${rt}` } : {},
+      credentials: "include",
     });
 
     if (!response.ok) {

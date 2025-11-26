@@ -93,11 +93,24 @@ export default function Login() {
         password,
       });
 
-      // Store access token and user info
       localStorage.setItem("authToken", response.data.accessToken);
+      if (response.data.refreshToken) {
+        localStorage.setItem("refreshToken", response.data.refreshToken);
+      }
       localStorage.setItem("userId", response.data.user._id);
       localStorage.setItem("user", JSON.stringify(response.data.user)); //newly addded
 
+      // Obtain a service-scoped token for product-service (optional optimization)
+      try {
+        const exRes = await fetch("http://localhost:5001/api/token/exchange", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${response.data.accessToken}` },
+        });
+        if (exRes.ok) {
+          const ex = await exRes.json();
+          if (ex?.token) localStorage.setItem("productServiceToken", ex.token);
+        }
+      } catch {}
 
       console.log("Login successful!", response.data);
       navigate(`/dashboard/${response.data.user._id}`); //newly added

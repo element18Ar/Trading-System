@@ -53,15 +53,9 @@ export default function Register() {
 
     try {
       const response = await registerUser(formData);
-
-      localStorage.setItem("authToken", response.data.token);
-      localStorage.setItem("userId", response.data.user._id);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-
-      console.log("Registration successful:", response.data);
-      alert("Registration successful!");
-
-      navigate(`/dashboard/${response.data.user._id}`);
+      localStorage.setItem("registeredEmail", response.data.user.email);
+      alert("Registration successful! Please log in.");
+      navigate("/login");
     } catch (err) {
       console.error("Registration failed:", err.response || err);
       const errorMessage = err.response?.data?.message || 'Network error. Please try again.';
@@ -244,4 +238,3 @@ export default function Register() {
     </div>
   );
 }
-
