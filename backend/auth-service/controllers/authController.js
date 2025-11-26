@@ -41,6 +41,9 @@ export const Register = async (req, res) => {
 export const Login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
 
     // Find user
     const user = await User.findOne({ email });
@@ -55,24 +58,31 @@ export const Login = async (req, res) => {
     }
 
     // Generate Access Token
+    const accessSecret = process.env.JWT_SECRET || process.env.ACCESS_TOKEN_SECRET;
+    const refreshSecret = process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET;
+    if (!accessSecret || !refreshSecret) {
+      return res.status(500).json({ message: 'Server configuration error: missing JWT secrets' });
+    }
+
     const accessToken = jwt.sign(
       { id: user._id, role: user.role },
-      process.env.ACCESS_TOKEN_SECRET,
+      accessSecret,
       { expiresIn: '15m' }
     );
 
     // Generate Refresh Token
     const refreshToken = jwt.sign(
       { id: user._id, role: user.role },
-      process.env.REFRESH_TOKEN_SECRET,
+      refreshSecret,
       { expiresIn: '7d' }
     );
 
     // Store refresh token in secure HTTP-only cookie
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: false,     // set to true if using HTTPS
-      sameSite: 'strict',
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
     });
 
@@ -99,12 +109,18 @@ export const RefreshToken = async (req, res) => {
       return res.status(401).json({ message: 'No refresh token provided' });
     }
 
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+    const accessSecret = process.env.JWT_SECRET || process.env.ACCESS_TOKEN_SECRET;
+    const refreshSecret = process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET;
+    if (!accessSecret || !refreshSecret) {
+      return res.status(500).json({ message: 'Server configuration error: missing JWT secrets' });
+    }
+
+    jwt.verify(refreshToken, refreshSecret, (err, decoded) => {
       if (err) return res.status(403).json({ message: 'Invalid refresh token' });
 
       const accessToken = jwt.sign(
         { id: decoded.id, role: decoded.role },
-        process.env.ACCESS_TOKEN_SECRET,
+        accessSecret,
         { expiresIn: '15m' }
       );
 
