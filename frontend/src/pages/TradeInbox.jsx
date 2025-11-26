@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { List } from "lucide-react";
+import { getUserTrades } from "../api/tradeApi.js";
 
 // --- 🎨 STYLE CONSTANTS ---
 const COLOR_ACCENT = "#00BFA5";
@@ -20,13 +21,8 @@ export default function TradeInbox({ onSelectTrade }) {
 
     try {
       setLoading(true);
-      // NOTE: Ensure your backend runs on port 5001 as previously defined
-      const res = await fetch(`http://localhost:5001/api/trades/user/${userId}`);
-      
-      if (!res.ok) throw new Error("Failed to fetch trades");
-      
-      const data = await res.json();
-      setTrades(data);
+      const res = await getUserTrades(userId);
+      setTrades(res.data);
     } catch (error) {
       console.error("Error fetching trades:", error);
       setTrades([]);

@@ -57,8 +57,8 @@ export const loginUser = async (credentials) => {
 // ----------------------------
 export const refreshToken = async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/refresh-token`, {
-      method: "GET",
+    const response = await fetch(`${BACKEND_URL}/refresh`, {
+      method: "POST",
       credentials: "include", // Cookies must be sent
     });
 

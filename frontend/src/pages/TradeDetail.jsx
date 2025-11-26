@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, CornerLeftUp, CheckCircle, XCircle } from 'lucide-react';
+import { getTradeDetails, updateTradeStatus } from "../api/tradeApi.js";
+import { getMessages, sendMessage } from "../api/messageApi.js";
 
 // --- 🎨 STYLE CONSTANTS ---
 const COLOR_ACCENT = "#00BFA5";
@@ -19,17 +21,11 @@ export default function TradeDetail({ tradeId, onBack }) {
     const fetchTradeAndMessages = async () => {
         try {
             setLoading(true);
-            // 1. Fetch Trade Details
-            const tradeRes = await fetch(`http://localhost:4001/api/trades/${tradeId}`);
-            if (!tradeRes.ok) throw new Error("Failed to fetch trade details");
-            const tradeData = await tradeRes.json();
-            setTrade(tradeData);
+            const tradeRes = await getTradeDetails(tradeId);
+            setTrade(tradeRes.data);
 
-            // 2. Fetch Messages
-            const messagesRes = await fetch(`http://localhost:4001/api/messages/${tradeId}`);
-            if (!messagesRes.ok) throw new Error("Failed to fetch messages");
-            const messagesData = await messagesRes.json();
-            setMessages(messagesData);
+            const messagesRes = await getMessages(tradeId);
+            setMessages(messagesRes.data);
         } catch (error) {
             console.error("Error fetching trade data:", error);
             setTrade(null);
@@ -54,20 +50,14 @@ export default function TradeDetail({ tradeId, onBack }) {
         if (!newMessage.trim() || !trade) return;
 
         try {
-            const res = await fetch(`http://localhost:4001/api/messages`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    tradeId: trade._id,
-                    sender: userId,
-                    content: newMessage.trim(),
-                    type: 'text',
-                }),
+            const res = await sendMessage({
+                tradeId: trade._id,
+                sender: userId,
+                content: newMessage.trim(),
+                type: 'text',
             });
 
-            if (!res.ok) throw new Error('Failed to send message');
-            
-            const sentMessage = await res.json();
+            const sentMessage = res.data;
             // Since the backend populates sender, we need to manually add the username/avatar for immediate display
             const senderUser = trade.initiator._id === userId ? trade.initiator : trade.receiver;
             const tempMessage = { 
@@ -90,15 +80,8 @@ export default function TradeDetail({ tradeId, onBack }) {
         if (!window.confirm(`Are you sure you want to set status to ${status}?`)) return;
 
         try {
-            const res = await fetch(`http://localhost:4001/api/trades/${tradeId}/status`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status }),
-            });
-
-            if (!res.ok) throw new Error(`Failed to update trade status to ${status}`);
-            
-            const updatedTrade = await res.json();
+            const res = await updateTradeStatus(tradeId, { status });
+            const updatedTrade = res.data;
             setTrade(updatedTrade);
             alert(`Trade status successfully updated to ${status}.`);
 

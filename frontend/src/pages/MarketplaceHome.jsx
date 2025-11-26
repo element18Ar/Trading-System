@@ -15,7 +15,8 @@ export default function MarketplaceHome() {
         const res = await fetch("http://localhost:5001/api/v1/products/items");
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
-        setAllItems(Array.isArray(data.items) ? data.items : []);
+        const items = Array.isArray(data?.data?.items) ? data.data.items : (Array.isArray(data?.items) ? data.items : []);
+        setAllItems(items);
       } catch (error) {
         console.error("Failed to fetch marketplace items:", error);
       } finally {
