@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from "axios";
+import { refreshToken } from "../api/authApi.js";
 import { PlusCircle, User, Home, MessageSquare, LogOut } from "lucide-react";
 
 import MarketplaceHome from "./MarketplaceHome.jsx";
@@ -33,11 +34,38 @@ export default function Dashboard() {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        const res = await axios.get(`http://localhost:5000/api/users/${userId}`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {}
-        });
+        if (!token) {
+          navigate('/login');
+          return;
+        }
+        const doFetch = async (bearer) => {
+          return axios.get(`http://localhost:5000/api/users/${userId}`, {
+            headers: bearer ? { Authorization: `Bearer ${bearer}` } : {},
+            withCredentials: true,
+          });
+        };
+
+        let res = await doFetch(token);
         setUser(res.data);
       } catch (err) {
+        const status = err?.response?.status;
+        if (status === 401 || status === 403) {
+          try {
+            const data = await refreshToken();
+            const newToken = data.accessToken;
+            if (newToken) {
+              localStorage.setItem('authToken', newToken);
+              const res2 = await axios.get(`http://localhost:5000/api/users/${userId}`, {
+                headers: { Authorization: `Bearer ${newToken}` }
+              });
+              setUser(res2.data);
+              return;
+            }
+          } catch (refreshErr) {
+            console.error("Token refresh failed:", refreshErr);
+            navigate('/login');
+          }
+        }
         console.error("Failed to fetch user:", err);
       }
     };

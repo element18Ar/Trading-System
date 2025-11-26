@@ -15,6 +15,8 @@ app.use(express.json());
 app.use(cors({
   origin: "http://localhost:5173",
   credentials: true,
+  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"],
 }));
 
 app.use("/api/v1/products/items", itemRoutes);
@@ -31,10 +33,21 @@ app.post("/api/token/exchange", (req, res) => {
   }
   const token = authHeader.split(" ")[1];
   try {
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET);
+    const accessSecret = process.env.ACCESS_TOKEN_SECRET || 'dev_secret_key';
+    const serviceSecret = process.env.JWT_SECRET || 'dev_secret_key';
+    let decoded;
+    if (accessSecret) {
+      try { decoded = jwt.verify(token, accessSecret); } catch {}
+    }
+    if (!decoded && serviceSecret) {
+      try { decoded = jwt.verify(token, serviceSecret); } catch {}
+    }
+    if (!decoded) {
+      return res.status(403).json({ message: "Invalid or expired token" });
+    }
     const serviceToken = jwt.sign(
       { id: decoded.id, role: decoded.role },
-      process.env.JWT_SECRET,
+      serviceSecret || accessSecret,
       { expiresIn: "2h" }
     );
     return res.json({ token: serviceToken });

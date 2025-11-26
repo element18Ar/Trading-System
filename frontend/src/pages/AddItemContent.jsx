@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { refreshToken } from "../api/authApi.js";
 import { Upload } from "lucide-react";
 
 const COLOR_PRIMARY_DARK = "#2C2D2D";
@@ -27,11 +28,42 @@ const AddItemContent = ({ onSuccess }) => {
 
     try {
       const token = localStorage.getItem("productServiceToken") || localStorage.getItem("authToken");
-      const res = await fetch("http://localhost:5001/api/v1/products/items", {
+      let res = await fetch("http://localhost:5001/api/v1/products/items", {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData
       });
+      // If token invalid, try to exchange and retry once
+      if (!res.ok && (res.status === 401 || res.status === 403)) {
+        let auth = localStorage.getItem("authToken");
+        // Try refresh to obtain a new access token
+        try {
+          const rt = await refreshToken();
+          if (rt?.accessToken) {
+            auth = rt.accessToken;
+            localStorage.setItem("authToken", auth);
+          }
+        } catch {}
+        if (auth) {
+          try {
+            const exRes = await fetch("http://localhost:5001/api/token/exchange", {
+              method: "POST",
+              headers: { Authorization: `Bearer ${auth}` },
+            });
+            if (exRes.ok) {
+              const ex = await exRes.json();
+              if (ex?.token) {
+                localStorage.setItem("productServiceToken", ex.token);
+                res = await fetch("http://localhost:5001/api/v1/products/items", {
+                  method: "POST",
+                  headers: { Authorization: `Bearer ${ex.token}` },
+                  body: formData
+                });
+              }
+            }
+          } catch {}
+        }
+      }
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       await res.json();
       alert("Item Listed Successfully! ✅");
