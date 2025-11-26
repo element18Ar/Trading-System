@@ -1,48 +1,37 @@
 // Change: This line is correct for ES Modules.
 import Item from '../models/Item.js'; 
 
-/**
- * @desc    Lists a new item for sale
- * @route   POST /api/products/items
- * @access  Private (Requires a logged-in seller)
- */
-// Change: Use 'export const' instead of 'exports.listItem ='
+
 export const listItem = async (req, res) => {
-    try {
-        // 1. Determine the Seller ID to use:
-        //    - Use req.user.id if the user is authenticated (real system).
-        //    - Otherwise, use the 'seller' field sent in the request body (for testing).
-        //    - NOTE: The original code was overwriting the body with the invalid 'default_seller_id'.
-        
-        const finalSellerId = req.user ? req.user.id : req.body.seller; 
-        
-        // 2. Create the new Item document using the Item Model
-        const newItem = await Item.create({
-            // Spread the item details from the request (name, price, description, etc.)
-            ...req.body, 
-            
-            // Explicitly set the seller using the determined ID. 
-            // This ensures we use the valid ID from the body for testing.
-            seller: finalSellerId
-        });
+  try {
+    console.log("File received:", req.file);
+    console.log("Body received:", req.body);
 
-        // 3. Send a success response (Status 201: Created)
-        res.status(201).json({
-            status: 'success',
-            data: {
-                item: newItem
-            }
-        });
-
-    } catch (error) {
-        // Handle database or validation errors
-        res.status(400).json({
-            status: 'fail',
-            // Display the full error message for easier debugging
-            message: error.message
-        });
+    if (!req.file) {
+      return res.status(400).json({ message: "Image is required" });
     }
+
+    const { name, description, seller, price } = req.body;
+
+    const item = await Item.create({
+      name,
+      description,
+      seller,
+      price: price || 0,
+      image: req.file.path, // <--- save path from multer
+    });
+
+    res.status(201).json({
+      success: true,
+      item,
+    });
+
+  } catch (error) {
+    console.error("List item failed:", error);
+    res.status(500).json({ error: "Server error, cannot list item." });
+  }
 };
+
 
 /**
  * @desc    Get a list of all available items (for browsing/catalog)
