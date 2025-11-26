@@ -32,7 +32,10 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/users/${userId}`);
+        const token = localStorage.getItem('authToken');
+        const res = await axios.get(`http://localhost:5000/api/users/${userId}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
         setUser(res.data);
       } catch (err) {
         console.error("Failed to fetch user:", err);

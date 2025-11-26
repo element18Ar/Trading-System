@@ -4,13 +4,14 @@ import multer from 'multer';
 
 // 2. Import the *specific named exports* from the controller
 import { listItem, getAllItems } from '../controllers/itemController.js'; 
+import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
 
 const upload = multer({ dest: "uploads/" });
 
-router.post("/", upload.single("itemImage"), listItem);
+router.post("/", verifyToken, upload.single("itemImage"), listItem);
 router.get("/", getAllItems);
 
 export default router;
