@@ -58,8 +58,8 @@ export const Login = async (req, res) => {
     }
 
     // Generate Access Token
-    const accessSecret = process.env.JWT_SECRET || process.env.ACCESS_TOKEN_SECRET || 'dev_secret_key';
-    const refreshSecret = process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET || 'dev_secret_key';
+    const accessSecret = process.env.ACCESS_TOKEN_SECRET || 'dev_secret_key';
+    const refreshSecret = process.env.REFRESH_TOKEN_SECRET || 'dev_secret_key';
 
     const accessToken = jwt.sign(
       { id: user._id, role: user.role },
@@ -86,6 +86,7 @@ export const Login = async (req, res) => {
     res.json({
       message: 'Login successful',
       accessToken,
+      refreshToken,
       user: {
         _id: user._id,
         username: user.username,
@@ -100,14 +101,17 @@ export const Login = async (req, res) => {
 
 export const RefreshToken = async (req, res) => {
   try {
-    const refreshToken = req.cookies.refreshToken;
+    const headerAuth = req.headers.authorization || req.headers.Authorization;
+    const tokenFromHeader = headerAuth && headerAuth.startsWith('Bearer ') ? headerAuth.split(' ')[1] : null;
+    const tokenFromBody = req.body && req.body.refreshToken ? req.body.refreshToken : null;
+    const refreshToken = req.cookies.refreshToken || tokenFromHeader || tokenFromBody || req.headers['x-refresh-token'];
 
     if (!refreshToken) {
       return res.status(401).json({ message: 'No refresh token provided' });
     }
 
-    const accessSecret = process.env.JWT_SECRET || process.env.ACCESS_TOKEN_SECRET || 'dev_secret_key';
-    const refreshSecret = process.env.REFRESH_TOKEN_SECRET || process.env.JWT_SECRET || 'dev_secret_key';
+    const accessSecret = process.env.ACCESS_TOKEN_SECRET || 'dev_secret_key';
+    const refreshSecret = process.env.REFRESH_TOKEN_SECRET || 'dev_secret_key';
 
     jwt.verify(refreshToken, refreshSecret, (err, decoded) => {
       if (err) return res.status(403).json({ message: 'Invalid refresh token' });

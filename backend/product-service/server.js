@@ -13,10 +13,8 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: true,
   credentials: true,
-  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
-  allowedHeaders: ["Content-Type","Authorization"],
 }));
 
 app.use("/api/v1/products/items", itemRoutes);
@@ -25,7 +23,6 @@ app.get("/", (req, res) => {
   res.send("Product Service is operational.");
 });
 
-// Token exchange: accept auth-service token and mint service-scoped token
 app.post("/api/token/exchange", (req, res) => {
   const authHeader = req.headers.authorization || req.headers.Authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
