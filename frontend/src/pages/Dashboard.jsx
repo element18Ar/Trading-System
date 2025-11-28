@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import axios from "axios";
 import { refreshToken } from "../api/authApi.js";
 import { PlusCircle, User, Home, MessageSquare, LogOut } from "lucide-react";
@@ -25,6 +25,7 @@ const BASE_STYLES = {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { userId } = useParams(); // ✅ Correct location
+  const location = useLocation();
   const [user, setUser] = useState(null); // store fetched user
   const [currentView, setCurrentView] = useState("Home");
   const [selectedTrade, setSelectedTrade] = useState(null);
@@ -71,7 +72,27 @@ export default function Dashboard() {
     };
 
     fetchUser();
-  }, [userId]);
+
+    // View routing via query params
+    const params = new URLSearchParams(location.search);
+    const viewParam = params.get('view');
+    const tradeParam = params.get('trade');
+
+    if (viewParam === 'Inbox') {
+      setCurrentView('Inbox');
+    }
+    if (tradeParam) {
+      setSelectedTrade(tradeParam);
+      setCurrentView('TradeDetail');
+    } else {
+      const active = localStorage.getItem('activeTradeId');
+      if (active) {
+        setSelectedTrade(active);
+        setCurrentView('TradeDetail');
+        localStorage.removeItem('activeTradeId');
+      }
+    }
+  }, [userId, location.search]);
 
   const handleLogout = () => {
     localStorage.removeItem("userId");

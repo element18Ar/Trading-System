@@ -19,6 +19,10 @@ const TradeSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Item'
   }],
+  item: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Item',
+  },
   cashOffer: {
     amount: { type: Number, default: 0 },
     currency: { type: String, default: 'php' }

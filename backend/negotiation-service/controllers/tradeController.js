@@ -3,7 +3,7 @@ import Item from '../../product-service/models/Item.js'; // Make sure this path 
 
 export const createTrade = async (req, res) => {
   try {
-    const { initiatorId, receiverId, receiverItemId } = req.body;
+    const { initiatorId, receiverId, receiverItemId, itemId } = req.body;
 
     const existingTrade = await Trade.findOne({
       initiator: initiatorId,
@@ -19,6 +19,7 @@ export const createTrade = async (req, res) => {
       receiver: receiverId,
       receiverItems: [receiverItemId],
       initiatorItems: [],
+      item: itemId || receiverItemId,
       status: 'proposed',
       lastActivity: Date.now()
     });

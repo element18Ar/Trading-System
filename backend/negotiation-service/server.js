@@ -16,8 +16,13 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-  origin: true,
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5175",
+  ],
   credentials: true,
+  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"],
 }));
 
 app.get("/", (req, res) => res.send("Negotiation Service is operational."));
@@ -44,7 +49,7 @@ app.post("/api/token/exchange", (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5002;
+const PORT = process.env.NEGOTIATION_SERVICE_PORT || process.env.PORT || 5002;
 
 connectDB(mongoose)
   .then(() => {

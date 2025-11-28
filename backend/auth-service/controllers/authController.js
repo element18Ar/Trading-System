@@ -64,14 +64,14 @@ export const Login = async (req, res) => {
     const accessToken = jwt.sign(
       { id: user._id, role: user.role },
       accessSecret,
-      { expiresIn: '15m' }
+      { expiresIn: '15m', issuer: 'auth-service' }
     );
 
     // Generate Refresh Token
     const refreshToken = jwt.sign(
       { id: user._id, role: user.role },
       refreshSecret,
-      { expiresIn: '7d' }
+      { expiresIn: '7d', issuer: 'auth-service' }
     );
 
     // Store refresh token in secure HTTP-only cookie

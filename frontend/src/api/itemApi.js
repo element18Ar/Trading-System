@@ -21,8 +21,10 @@ async function ensureProductToken() {
       }
       // If exchange failed (e.g., expired auth), try refresh and retry once
       if (!token && (!res.ok || res.status === 401 || res.status === 403)) {
+        const rt = localStorage.getItem("refreshToken");
         const refreshRes = await fetch(`http://localhost:5000/api/auth/refresh`, {
           method: "POST",
+          headers: rt ? { Authorization: `Bearer ${rt}` } : {},
           credentials: "include",
         });
         if (refreshRes.ok) {

@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { createTrade } from "../api/tradeApi.js";
 
 const COLOR_PRIMARY_DARK = "#2C2D2D";
 const COLOR_ACCENT = "#00BFA5";
@@ -7,6 +9,7 @@ const COLOR_TEXT_LIGHT = "white";
 export default function MarketplaceHome() {
   const [allItems, setAllItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -38,13 +41,46 @@ export default function MarketplaceHome() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.5rem" }}>
           {allItems.map(item => (
             <div key={item._id} style={{ padding: "1rem", background: COLOR_PRIMARY_DARK, borderRadius: "12px", boxShadow: "0 4px 10px rgba(0,0,0,0.3)", border: `1px solid ${COLOR_ACCENT}50` }}>
-              <div style={{ height: '150px', backgroundColor: '#444', borderRadius: '8px', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '0.9rem' }}>
-                [Item Photo]
-              </div>
+              {item.image ? (
+                <img
+                  src={`http://localhost:5001/${String(item.image).replace(/\\\\/g, '/').replace(/^\//, '')}`}
+                  alt={item.name}
+                  style={{ height: '150px', width: '100%', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }}
+                />
+              ) : (
+                <div style={{ height: '150px', backgroundColor: '#444', borderRadius: '8px', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '0.9rem' }}>
+                  No photo
+                </div>
+              )}
               <h3 style={{ color: COLOR_TEXT_LIGHT, marginBottom: '0.5rem' }}>{item.name}</h3>
               <p style={{ opacity: 0.7, fontSize: '0.9rem', minHeight: '40px' }}>{item.description?.substring(0, 100)}...</p>
               <p style={{ fontWeight: 600, marginTop: '1rem', color: COLOR_ACCENT }}>Barter Item</p>
               <p style={{ fontSize: '0.8rem', opacity: 0.5 }}>Seller ID: {item.seller?.substring(0, 8)}...</p>
+              <button
+                style={{ marginTop: '0.75rem', padding: '0.6rem 0.8rem', borderRadius: '8px', border: 'none', background: COLOR_ACCENT, color: COLOR_PRIMARY_DARK, fontWeight: 700, cursor: 'pointer' }}
+                onClick={async () => {
+                  const initiatorId = localStorage.getItem("userId");
+                  if (!initiatorId) {
+                    navigate('/login');
+                    return;
+                  }
+                  try {
+                    const res = await createTrade({
+                      initiatorId,
+                      receiverId: item.seller,
+                      receiverItemId: item._id,
+                      itemId: item._id,
+                    });
+                    const trade = res.data;
+                    if (trade && trade._id) {
+                      localStorage.setItem('activeTradeId', trade._id);
+                      navigate(`/dashboard/${initiatorId}?view=Inbox&trade=${trade._id}`);
+                    }
+                  } catch (e) {
+                    console.error('Failed to start chat for item:', e);
+                  }
+                }}
+              >Discuss / Chat</button>
             </div>
           ))}
         </div>

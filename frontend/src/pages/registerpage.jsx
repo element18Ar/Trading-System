@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios"; // Import axios for API calls
+import { registerUser } from "../api/authApi.js";
 
 // Custom hook to detect screen size for responsive styling
 const useScreenSize = () => {
@@ -16,10 +16,7 @@ const useScreenSize = () => {
   return { width, isMobile };
 };
 
-// --- API CALL FUNCTION ---
-const registerUser = async (data) => {
-  return await axios.post("http://localhost:5000/api/auth/register", data);
-};
+// API call moved to shared client in ../api/authApi.js
 
 export default function Register() {
   const { isMobile } = useScreenSize();
@@ -53,13 +50,13 @@ export default function Register() {
 
     try {
       const response = await registerUser(formData);
-      localStorage.setItem("registeredEmail", response.data.user.email);
+      const email = response?.user?.email || formData.email;
+      localStorage.setItem("registeredEmail", email);
       alert("Registration successful! Please log in.");
       navigate("/login");
     } catch (err) {
-      console.error("Registration failed:", err.response || err);
-      const errorMessage = err.response?.data?.message || 'Network error. Please try again.';
-      setError(errorMessage);
+      const message = err?.message || 'Network error. Please try again.';
+      setError(message);
     } finally {
       setLoading(false);
     }
