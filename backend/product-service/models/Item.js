@@ -13,11 +13,6 @@ const ItemSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    price: {
-      type: Number,
-      default: 0,
-      min: 0,
-    },
 
     // NEW: Store uploaded image file path
     image: {
@@ -25,13 +20,7 @@ const ItemSchema = new mongoose.Schema(
       required: true,
     },
 
-    // NEW: quantity (optional)
-    quantity: {
-      type: Number,
-      default: 1,
-      min: 1,
-    },
-
+  
     // Required seller ID (ObjectId)
     seller: {
       type: mongoose.Schema.Types.ObjectId,

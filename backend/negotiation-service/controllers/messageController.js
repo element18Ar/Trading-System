@@ -8,7 +8,7 @@ export const createMessage = async (req, res) => {
     const tradeExists = await Trade.findById(tradeId);
     if (!tradeExists) return res.status(404).json({ error: "Trade room not found" });
 
-    const newMessage = new Message({ tradeId, sender, content, type: type || 'text' });
+    const newMessage = new Message({ tradeId, sender, content, type: type || 'text', itemId: tradeExists.item });
     const savedMessage = await newMessage.save();
 
     await Trade.findByIdAndUpdate(tradeId, { lastActivity: Date.now() });

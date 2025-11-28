@@ -3,12 +3,14 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 export function loadEnv(moduleUrl) {
-  const __filename = fileURLToPath(moduleUrl);
-  const __dirname = path.dirname(__filename);
+  const callerFile = fileURLToPath(moduleUrl);
+  const serviceDir = path.dirname(callerFile);
+  const backendDir = path.resolve(serviceDir, "../");
+  const projectRoot = path.resolve(serviceDir, "../../");
 
-  // Load global .env
-  DotenvFlow.config({ path: path.resolve(__dirname, "../") });
+  // 1) Load project root .env (optional)
+  DotenvFlow.config({ path: projectRoot, silent: true });
 
-  // Load service-specific .env
-  DotenvFlow.config({ path: path.resolve(__dirname, ".") });
+  // 2) Load service-specific .env (primary, override root values)
+  DotenvFlow.config({ path: serviceDir, silent: false, override: true });
 }

@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenvFlow from "dotenv-flow";
 import cookieParser from "cookie-parser";
-import cors from "cors";
+import cors from "cors";//wala nakita dae..
 
 import connectDB from "../config/db.js"; 
 import { loadEnv } from "../config/loadEnv.js";
@@ -19,10 +19,24 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-  origin: true,
+const corsOptions = {
+  origin: (origin, cb) => cb(null, origin || true),
   credentials: true,
-}));
+  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"],
+  optionsSuccessStatus: 204,
+};
+app.use(cors(corsOptions));
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin) res.header("Access-Control-Allow-Origin", origin);
+  res.header("Vary", "Origin");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
 
 // Routes
 app.use('/api/auth', authRoutes); 
