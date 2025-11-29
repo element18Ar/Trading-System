@@ -1,5 +1,7 @@
 import Trade from '../models/trade.js';
-import Item from '../../product-service/models/Item.js'; // Make sure this path is correct
+import Item from '../../product-service/models/Item.js';
+import mongoose from 'mongoose';
+import '../models/user.js';
 
 export const createTrade = async (req, res) => {
   try {
@@ -33,11 +35,21 @@ export const createTrade = async (req, res) => {
 
 export const getTradeDetails = async (req, res) => {
   try {
-    const trade = await Trade.findById(req.params.tradeId)
-      .populate('initiator', 'username email')
-      .populate('receiver', 'username email')
-      .populate('initiatorItems')
-      .populate('receiverItems');
+    const tradeId = req.params.tradeId;
+    const isValid = typeof tradeId === 'string' && /^[0-9a-fA-F]{24}$/.test(tradeId);
+    if (!isValid) {
+      return res.status(400).json({ error: "Invalid trade id format" });
+    }
+    let trade = null;
+    try {
+      trade = await Trade.findById(tradeId)
+        .populate('initiator', 'username email')
+        .populate('receiver', 'username email')
+        .populate('initiatorItems')
+        .populate('receiverItems');
+    } catch (_) {
+      trade = await Trade.findById(tradeId);
+    }
 
     if (!trade) return res.status(404).json({ error: "Trade not found" });
 
@@ -51,6 +63,10 @@ export const updateTradeOffer = async (req, res) => {
   try {
     const { userId, items, cash } = req.body;
     const tradeId = req.params.tradeId;
+    const isValid = typeof tradeId === 'string' && /^[0-9a-fA-F]{24}$/.test(tradeId);
+    if (!isValid) {
+      return res.status(400).json({ error: "Invalid trade id format" });
+    }
 
     const trade = await Trade.findById(tradeId);
     if (!trade) return res.status(404).json({ error: "Trade not found" });
@@ -74,7 +90,12 @@ export const updateTradeOffer = async (req, res) => {
 export const updateTradeStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const trade = await Trade.findById(req.params.tradeId);
+    const tradeId = req.params.tradeId;
+    const isValid = typeof tradeId === 'string' && /^[0-9a-fA-F]{24}$/.test(tradeId);
+    if (!isValid) {
+      return res.status(400).json({ error: "Invalid trade id format" });
+    }
+    const trade = await Trade.findById(tradeId);
     if (!trade) return res.status(404).json({ error: "Trade not found" });
 
     trade.status = status;

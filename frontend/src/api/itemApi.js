@@ -3,6 +3,15 @@ import axios from "axios";
 const PRODUCT_BASE = "http://localhost:5001";
 const PRODUCT_API = `${PRODUCT_BASE}/api/v1/products/items`;
 
+async function pingProductService() {
+  try {
+    const res = await fetch(`${PRODUCT_BASE}/`, { method: "GET" });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 async function ensureProductToken() {
   let token = localStorage.getItem("productServiceToken");
   const authToken = localStorage.getItem("authToken");
@@ -65,6 +74,12 @@ export const getItemById = async (itemId) => {
 export const createItem = async (data) => {
   const token = await ensureProductToken();
   const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const reachable = await pingProductService();
+  if (!reachable) {
+    const err = new Error("PRODUCT_SERVICE_OFFLINE");
+    err.code = "PRODUCT_SERVICE_OFFLINE";
+    throw err;
+  }
   return axios.post(PRODUCT_API, data, { headers });
 };
 
