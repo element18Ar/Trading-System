@@ -1,5 +1,7 @@
 // Change: This line is correct for ES Modules.
 import Item from '../models/Item.js'; 
+import fs from 'fs';
+import path from 'path';
 
 
 export const listItem = async (req, res) => {
@@ -61,4 +63,35 @@ export const getAllItems = async (req, res) => {
             message: 'Could not fetch items.'
         });
     }
+};
+
+export const deleteItem = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const isValid = typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id);
+    if (!isValid) {
+      return res.status(400).json({ message: 'Invalid item id format' });
+    }
+
+    const item = await Item.findById(id);
+    if (!item) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+
+    const userId = String(req.user?.id || req.user?.sub || '');
+    if (!userId || String(item.seller) !== userId) {
+      return res.status(403).json({ message: 'Not authorized to delete this item' });
+    }
+
+    await Item.deleteOne({ _id: id });
+    const img = item.image;
+    if (img) {
+      const filePath = path.isAbsolute(img) ? img : path.join(process.cwd(), 'backend', 'product-service', img.replace(/^\/?/, ''));
+      fs.promises.unlink(filePath).catch(() => {});
+    }
+
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to delete item' });
+  }
 };
