@@ -1,8 +1,12 @@
-// Change: This line is correct for ES Modules.
-import Item from '../models/Item.js'; 
+// controllers/itemController.js
+import Item from "../models/Item.js";
 
-
-export const listItem = async (req, res) => {
+/**
+ * @desc List a new item
+ * @route POST /api/v1/products/items
+ * @access Private
+ */
+const listItem = async (req, res) => {
   try {
     console.log("File received:", req.file);
     console.log("Body received:", req.body);
@@ -18,7 +22,8 @@ export const listItem = async (req, res) => {
       description,
       seller,
       price: price || 0,
-      image: req.file.path, // <--- save path from multer
+      image: req.file.path,
+      isListed: true,
     });
 
     res.status(201).json({
@@ -32,33 +37,29 @@ export const listItem = async (req, res) => {
   }
 };
 
-
 /**
- * @desc    Get a list of all available items (for browsing/catalog)
- * @route   GET /api/products/items
- * @access  Public
+ * @desc Get all listed items
+ * @route GET /api/v1/products/items
+ * @access Public
  */
-// Change: Use 'export const' instead of 'exports.getAllItems ='
-export const getAllItems = async (req, res) => {
-    try {
-        // 1. Fetch all items that are currently listed (isListed: true)
-        // You would typically add filtering, sorting, and pagination here for a real system
-        const items = await Item.find({ isListed: true });
-        
-        // 2. Send a success response (Status 200: OK)
-        res.status(200).json({
-            status: 'success',
-            results: items.length,
-            data: {
-                items: items
-            }
-        });
+const getAllItems = async (req, res) => {
+  try {
+    const items = await Item.find({ isListed: true });
 
-    } catch (error) {
-        // Handle errors
-        res.status(500).json({
-            status: 'error',
-            message: 'Could not fetch items.'
-        });
-    }
+    res.status(200).json({
+      status: "success",
+      results: items.length,
+      data: { items }
+    });
+
+  } catch (error) {
+    console.error("Get items failed:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Could not fetch items."
+    });
+  }
 };
+
+// FIXED EXPORT (ESM default+named issue removed)
+export { listItem, getAllItems };

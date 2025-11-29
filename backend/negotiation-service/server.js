@@ -32,10 +32,12 @@ app.post("/api/token/exchange", (req, res) => {
   }
   const token = authHeader.split(" ")[1];
   try {
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET);
+    const verifySecret = process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET || 'dev_secret_key';
+    const signSecret = process.env.JWT_SECRET || process.env.ACCESS_TOKEN_SECRET || 'dev_secret_key';
+    const decoded = jwt.verify(token, verifySecret);
     const serviceToken = jwt.sign(
       { id: decoded.id, role: decoded.role },
-      process.env.JWT_SECRET,
+      signSecret,
       { expiresIn: "2h" }
     );
     return res.json({ token: serviceToken });
