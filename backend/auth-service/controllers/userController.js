@@ -13,7 +13,16 @@ export const getUsers = async (req, res) => {
 // GET a single user by ID (optional if you want it)
 export const getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const id = req.params.id;
+    if (!id || typeof id !== 'string') {
+      return res.status(400).json({ message: 'Invalid user id' });
+    }
+    // Validate ObjectId format to avoid CastError
+    const isValid = /^[0-9a-fA-F]{24}$/.test(id);
+    if (!isValid) {
+      return res.status(400).json({ message: 'Invalid user id format' });
+    }
+    const user = await User.findById(id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }

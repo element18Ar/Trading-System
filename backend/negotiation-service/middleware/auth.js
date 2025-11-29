@@ -12,11 +12,26 @@ export const verifyToken = (req, res, next) => {
   const token = authHeader.split(' ')[1];
 
   try {
-    const secret = process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET;
-    const verified = jwt.verify(token, secret);
-    
-    // 3. Add user info to request so controllers can use it
-    req.user = verified; 
+    const accessSecret = process.env.ACCESS_TOKEN_SECRET;
+    const serviceSecret = process.env.JWT_SECRET;
+
+    let verified;
+    if (accessSecret) {
+      try {
+        verified = jwt.verify(token, accessSecret);
+      } catch (_) {}
+    }
+    if (!verified && serviceSecret) {
+      try {
+        verified = jwt.verify(token, serviceSecret);
+      } catch (_) {}
+    }
+
+    if (!verified) {
+      return res.status(403).json({ message: "Invalid or expired token" });
+    }
+
+    req.user = verified;
     next();
   } catch (err) {
     res.status(403).json({ message: "Invalid or expired token" });
