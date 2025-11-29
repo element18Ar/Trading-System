@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Trash } from "lucide-react";
+import { deleteItem } from "../api/itemApi.js";
 
 const COLOR_PRIMARY_DARK = "#2C2D2D";
 const COLOR_ACCENT = "#00BFA5";
@@ -28,6 +30,18 @@ const initialUserDetails = {
   const [userDetails, setUserDetails] = useState(initialUserDetails);
   const [isEditing, setIsEditing] = useState(false);
   const [newUsername, setNewUsername] = useState(initialUserDetails.username);
+
+  const handleDelete = async (id) => {
+    const ok = window.confirm("Delete this item?");
+    if (!ok) return;
+    try {
+      await deleteItem(id);
+      setItems(prev => prev.filter(i => i._id !== id));
+      alert("Item deleted");
+    } catch (e) {
+      alert(e?.response?.data?.message || "Failed to delete item");
+    }
+  };
 
   const handleSaveProfile = () => {
     setUserDetails(prev => ({ ...prev, username: newUsername }));
@@ -90,7 +104,10 @@ const initialUserDetails = {
       {!loading && items.length > 0 && (
         <div style={{ marginTop: "2rem", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "1.5rem" }}>
           {items.map(item => (
-            <div key={item._id} style={{ padding: "1rem", background: COLOR_PRIMARY_DARK, borderRadius: "12px", boxShadow: "0 4px 10px rgba(0, 0, 0, 0.3)" }}>
+            <div key={item._id} style={{ padding: "1rem", background: COLOR_PRIMARY_DARK, borderRadius: "12px", boxShadow: "0 4px 10px rgba(0, 0, 0, 0.3)", position: 'relative' }}>
+              <button onClick={() => handleDelete(item._id)} style={{ position: 'absolute', right: '10px', top: '10px', background: COLOR_DANGER, border: 'none', borderRadius: '6px', padding: '0.3rem 0.4rem', color: COLOR_TEXT_LIGHT, cursor: 'pointer' }}>
+                <Trash size={16} />
+              </button>
               <h4 style={{ color: COLOR_ACCENT, marginBottom: '0.5rem' }}>{item.name}</h4>
               <p style={{ opacity: 0.7, fontSize: '0.9rem' }}>{item.description?.substring(0, 50)}...</p>
             </div>
